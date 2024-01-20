@@ -1,0 +1,69 @@
+﻿
+@{
+    ViewBag.Title = "AddTask";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>AddTask</h2>
+<hr />
+
+<div class="form-group has-danger">
+    <label class="form-label mt-4" for="Title">Title</label>
+    <input type="text" placeholder="Title" class="form-control is-invalid" id="txt_Title">
+</div>
+<div class="form-group has-danger">
+    <label class="form-label mt-4" for="Description">Description</label>
+    <input type="text" placeholder="Description" class="form-control is-invalid" id="txt_Description">
+</div>
+<div class="form-group has-danger">
+    <label class="form-label mt-4" for="Assignee">Assignee</label>
+    <input type="text" placeholder="Assignee" class="form-control is-invalid" id="txt_Assignee">
+</div>
+<div class="form-group has-danger">
+    <label class="form-label mt-4" for="DueDate">DueDate</label>
+    <input type="date" placeholder="DueDate" class="form-control is-invalid" id="dat_DueDate">
+</div>
+<div class="form-group">
+    <div class="form-group">
+        <div class="input-group mb-3">
+            <button class="btn btn-primary" type="button" id="btn_save">Save</button>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        var tok = sessionStorage.getItem("accessToken");
+        if (tok == null)
+            window.location.href = '/Task/Login';
+        $("#btn_save").click(function (e) {
+
+            //-----------------------------------------------------------------------------------------------------
+            e.preventDefault();
+            //-----------------------------------------------------------------------------------------------------
+            const Task = new Object();
+            Task.Id = 0;
+            Task.Title = $("#txt_Title").val();
+            Task.Description = $("#txt_Description").val();
+            Task.Assignee = $("#txt_Assignee").val();
+            Task.DueDate = $("#dat_DueDate").val();
+            Task.Status = 0;
+            //-----------------------------------------------------------------------------------------------------
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                url: 'http://localhost:51986/ApplicationTask/Task/Create',
+                headers: {
+                    'Authorization': "Basic " + tok
+                },
+                data: JSON.stringify(Task),
+                success: function (data, textStatus, xhr) {
+                    alert("Task Added Successfully");
+                    window.location.href = '/Task/Index';
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error in Operation');
+                }
+            });
+        });
+    </script>
+}

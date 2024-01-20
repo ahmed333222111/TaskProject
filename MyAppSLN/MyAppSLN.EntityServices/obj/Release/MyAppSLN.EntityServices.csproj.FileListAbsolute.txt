@@ -1,0 +1,10 @@
+D:\Task\MyAppSLN\MyAppSLN.EntityServices\bin\Release\MyAppSLN.EntityServices.dll
+D:\Task\MyAppSLN\MyAppSLN.EntityServices\bin\Release\MyAppSLN.EntityServices.pdb
+D:\Task\MyAppSLN\MyAppSLN.EntityServices\bin\Release\MyAppSLN.Entity.dll
+D:\Task\MyAppSLN\MyAppSLN.EntityServices\bin\Release\MyAppSLN.Entity.pdb
+D:\Task\MyAppSLN\MyAppSLN.EntityServices\bin\Release\MyAppSLN.Entity.dll.config
+D:\Task\MyAppSLN\MyAppSLN.EntityServices\obj\Release\MyAppSLN.EntityServices.csproj.AssemblyReference.cache
+D:\Task\MyAppSLN\MyAppSLN.EntityServices\obj\Release\MyAppSLN.EntityServices.csproj.CoreCompileInputs.cache
+D:\Task\MyAppSLN\MyAppSLN.EntityServices\obj\Release\MyAppSLN.EntityServices.csproj.CopyComplete
+D:\Task\MyAppSLN\MyAppSLN.EntityServices\obj\Release\MyAppSLN.EntityServices.dll
+D:\Task\MyAppSLN\MyAppSLN.EntityServices\obj\Release\MyAppSLN.EntityServices.pdb

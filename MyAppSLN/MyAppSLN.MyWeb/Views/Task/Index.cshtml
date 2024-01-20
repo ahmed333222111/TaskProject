@@ -1,0 +1,190 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+<hr />
+<h4>@Html.ActionLink("Add New Task", "AddTask", "Task")</h4>
+<h4>@Html.ActionLink("Export Excel", "Excel", "Task")</h4>
+<hr />
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Assignee</th>
+            <th>DueDate</th>
+            <th>Status</th>
+            <th>Delete</th>
+            <th>Update</th>
+        </tr>
+    </thead>
+    <tbody id="MyTask">
+    </tbody>
+</table>
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">تعديل المهمة</h4>
+            </div>
+            <div class="form-group has-danger">
+                <label class="form-label mt-4" for="Id">Id</label>
+                <input type="text" placeholder="Id" class="form-control is-invalid" disabled id="txt_id">
+            </div>
+            <div class="form-group has-danger">
+                <label class="form-label mt-4" for="Title">Title</label>
+                <input type="text" placeholder="Title" class="form-control is-invalid" id="txt_Title">
+            </div>
+            <div class="form-group has-danger">
+                <label class="form-label mt-4" for="Description">Description</label>
+                <input type="text" placeholder="Description" class="form-control is-invalid" id="txt_Description">
+            </div>
+            <div class="form-group has-danger">
+                <label class="form-label mt-4" for="Assignee">Assignee</label>
+                <input type="text" placeholder="Assignee" class="form-control is-invalid" id="txt_Assignee">
+            </div>
+            <div class="form-group has-danger">
+                <label class="form-label mt-4" for="DueDate">DueDate</label>
+                <input type="date" placeholder="DueDate" class="form-control is-invalid" id="dat_DueDate">
+            </div>
+            <div class="form-group has-danger">
+                <label class="form-label mt-4" for="Status">Status</label>
+                <input type="text" placeholder="DueDate" class="form-control is-invalid" id="txt_Status">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button id="UpdateTask" type="submit" class="btn btn-danger">تعديل</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        var tok = sessionStorage.getItem("accessToken");
+        if (tok == null)
+            window.location.href = '/Task/Login';
+        $(document).ready(function () {
+
+            GetAllTask();
+        });
+
+        function GetAllTask() {
+            $.ajax({
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                url: 'http://localhost:51986/ApplicationTask/Task/List',
+                headers: {
+                    'Authorization': "Basic " + tok
+                },
+                success: function (data, textStatus, xhr) {
+                    for (var i in data) {
+                        var _status = '';
+                        if (data[i].Status == 0) {
+                            _status = 'غير مكتمل';
+                        } else {
+                            _status = ' مكتمل';
+                        }
+                        $("#MyTask").append('<tr><td>' + data[i].Id + '</td><td>' + data[i].Title + '</td><td>' + data[i].Description + '</td><td>' + data[i].Assignee + '</td><td>' + data[i].DueDate + '</td><td>' + _status + '</td><td><a class="btn btn-danger taskselect" data-delete_id =' + data[i].Id + '>delete</a></td><td><a class="btn btn-Primary  taskupdate"  data-update_id =' + data[i].Id + '>Update</a></td></tr>');
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error in Message');
+                }
+            });
+        }
+
+
+
+        $("#MyTask").on("click", ".taskupdate", function (e) {
+            e.preventDefault();
+            var row = $(this).closest("tr");
+            $.ajax({
+                type: 'Get',
+                contentType: 'application/json; charset=utf-8',
+                url: 'http://localhost:51986/ApplicationTask/Task/' + $(this).attr("data-update_id") + '',
+                headers: {
+                    'Authorization': "Basic " + tok
+                },
+                success: function (data, textStatus, xhr) {
+                    $("#txt_id").val(data.Id);
+                    $("#txt_Title").val(data.Title);
+                    $("#txt_Description").val(data.Description);
+                    $("#txt_Assignee").val(data.Assignee);
+                    $("#dat_DueDate").val(data.DueDate);
+                    if (data.Status == 0) {
+                        $("#txt_Status").val('غير مكتمل');
+                    } else {
+                        $("#txt_Status").val(' مكتمل');
+                    }
+                    $('#myModal').modal('show');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error in Operation');
+                }
+            });
+        });
+        $("#MyTask").on("click", ".taskselect", function (e) {
+            e.preventDefault();
+            if (confirm('هل انت متاكد من مسح المهمة؟')) {
+                var row = $(this).closest("tr");
+                $.ajax({
+                    type: 'Delete',
+                    contentType: 'application/json; charset=utf-8',
+                    url: 'http://localhost:51986/ApplicationTask/Task/Delete/' + $(this).attr("data-delete_id") + '',
+                    headers: {
+                        'Authorization': "Basic " + tok
+                    },
+                    success: function (data, textStatus, xhr) {
+                        row.remove();
+                        //alert("تم حذف المهمة بنجاح");
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        alert('Error in Operation');
+                    }
+                });
+                console.log('delete has been success');
+            } else {
+                console.log('Thing was not saved to the database.');
+            }
+        });
+        $("#UpdateTask").click(function (e) {
+
+            //-----------------------------------------------------------------------------------------------------
+            e.preventDefault();
+            //-----------------------------------------------------------------------------------------------------
+            var currentdate = new Date();
+            //-----------------------------------------------------------------------------------------------------
+            const Task = new Object();
+            Task.Id = $("#txt_id").val();
+            Task.Title = $("#txt_Title").val();
+            Task.Description = $("#txt_Description").val();
+            Task.Assignee = $("#txt_Assignee").val();
+            Task.DueDate = $("#dat_DueDate").val();
+            Task.Status = 0;
+            //-----------------------------------------------------------------------------------------------------
+            $.ajax({
+                type: 'Put',
+                contentType: 'application/json; charset=utf-8',
+                url: 'http://localhost:51986/ApplicationTask/Task/Edit',
+                headers: {
+                    'Authorization': "Basic " + tok
+                },
+                data: JSON.stringify(Task),
+                success: function (data, textStatus, xhr) {
+                    alert("Task Updated Successfully");
+                    window.location.href = '/Task/Index';
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error in Operation');
+                }
+            });
+        });
+    </script>
+}
